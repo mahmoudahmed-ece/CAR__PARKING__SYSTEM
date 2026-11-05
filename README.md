@@ -41,32 +41,7 @@ warnings as the car gets closer, all on bare-metal C with layered, reusable driv
 
 ## System Overview
 
-```mermaid
-flowchart LR
-    subgraph Input
-        US["HC-SR04<br/>Ultrasonic Sensor"]
-    end
-
-    subgraph MCU["ATmega32 @ 16 MHz"]
-        GPIO["GPIO"]
-        ICU["ICU<br/>(Timer1 Input Capture)"]
-        APP["Application<br/>(CarParking.c)"]
-    end
-
-    subgraph Outputs
-        LCD["16x2 LCD"]
-        LEDS["Red / Green / Blue LEDs"]
-        BUZ["Buzzer"]
-    end
-
-    GPIO -- "TRIG (PD7)" --> US
-    US -- "ECHO (PD6)" --> ICU
-    ICU --> APP
-    APP --> GPIO
-    APP --> LCD
-    APP --> LEDS
-    APP --> BUZ
-```
+<p align="center"><img src="docs/system_overview.png" alt="System overview" width="720"></p>
 
 ---
 
@@ -180,19 +155,7 @@ flowchart LR
 
 ### Main loop
 
-```mermaid
-flowchart TD
-    A[Disable JTAG, enable interrupts] --> B[Initialize LCD, LEDs, buzzer, ultrasonic]
-    B --> C[Start-up message for 1 second]
-    C --> D[Trigger HC-SR04 and measure echo with ICU]
-    D --> E[Display distance on LCD]
-    E --> F{Distance ≤ 5 cm?}
-    F -- Yes --> G[Flash all LEDs, buzzer ON, show Stop]
-    F -- No --> H[Buzzer OFF, set LEDs by distance range]
-    G --> I[Wait 100 ms]
-    H --> I
-    I --> D
-```
+<p align="center"><img src="docs/main_loop.png" alt="Main loop flowchart" width="720"></p>
 
 ---
 
@@ -241,7 +204,8 @@ If no echo arrives within 40 ms, the last valid distance is kept.
 ## Project Structure
 
 ```
-Car_parking_sensor/
+CAR__PARKING__SYSTEM/
+├── docs/                  # Diagrams used in this README
 ├── CarParking.c           # Application: main loop and warning logic
 │
 ├── gpio.c / gpio.h        # MCAL: GPIO driver
@@ -276,10 +240,14 @@ Car_parking_sensor/
 
 **Steps**
 
-1. Import the project into Eclipse: *File → Import → Existing Projects into Workspace*.
-2. Check *Project → Properties → AVR → Target Hardware*: **ATmega32**, **16000000 Hz**.
-3. Build the project; the output `Car_parking_sensor.hex` is generated in the `Debug/` folder.
-4. Flash the hex file with AVRDUDE, or load it into the ATmega32 in Proteus with the clock set to 16 MHz.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mahmoudahmed-ece/CAR__PARKING__SYSTEM.git
+   ```
+2. Import it into Eclipse: *File → Import → Existing Projects into Workspace*.
+3. Check *Project → Properties → AVR → Target Hardware*: **ATmega32**, **16000000 Hz**.
+4. Build the project; the output `Car_parking_sensor.hex` is generated in the `Debug/` folder.
+5. Flash the hex file with AVRDUDE, or load it into the ATmega32 in Proteus with the clock set to 16 MHz.
 
 ---
 
